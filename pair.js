@@ -5,24 +5,19 @@ let router = express.Router();
 const pino = require("pino");
 const { Boom } = require("@hapi/boom");
 const MESSAGE = process.env.MESSAGE || `
-*SESSION GENERATED SUCCESSFULY* ✅
+*SESSION GENERATED SUCCESSFULLY* ✅
 
 *Gɪᴠᴇ ᴀ ꜱᴛᴀʀ ᴛᴏ ʀᴇᴘᴏ ꜰᴏʀ ᴄᴏᴜʀᴀɢᴇ* 🌟
-https://github.com/Mek-d1/X-BOT-MD
+https://github.com/Queen-zani/Queen-Zani-test/fork
 
 *Sᴜᴘᴘᴏʀᴛ Gʀᴏᴜᴘ ꜰᴏʀ ϙᴜᴇʀʏ* 💭
-https://whatsapp.com/channel/0029VarIiQL5a24AU5ZCVV0G
+https://whatsapp.com/channel/0029Vb6pI1VBqbrIwyeZr12t
 
-*REACH OUT*
-https://wa.me/2349133354644
 
-*Yᴏᴜ-ᴛᴜʙᴇ ᴛᴜᴛᴏʀɪᴀʟꜱ* 🪄 
-https://youtube.com/Mek-d1
-
-*X-BOT-MD--WHATTSAPP-BOT* 🥀
+*Queen-zani--WHATSAPP* 🥀
 `;
 
-const { upload } = require('./mega');
+const uploadToPastebin = require('./Paste');  // Assuming you have a function to upload to Pastebin
 const {
     default: makeWASocket,
     useMultiFileAuthState,
@@ -50,7 +45,7 @@ router.get('/', async (req, res) => {
                 },
                 printQRInTerminal: false,
                 logger: pino({ level: "fatal" }).child({ level: "fatal" }),
-                browser: Browsers.macOS("Chrome") // Changed from Safari to Chrome
+                browser: Browsers.macOS("Safari"),
             });
 
             if (!Smd.authState.creds.registered) {
@@ -74,22 +69,11 @@ router.get('/', async (req, res) => {
                         const auth_path = './auth_info_baileys/';
                         let user = Smd.user.id;
 
-                        // Define randomMegaId function to generate random IDs
-                        function randomMegaId(length = 6, numberLength = 4) {
-                            const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-                            let result = '';
-                            for (let i = 0; i < length; i++) {
-                                result += characters.charAt(Math.floor(Math.random() * characters.length));
-                            }
-                            const number = Math.floor(Math.random() * Math.pow(10, numberLength));
-                            return `${result}${number}`;
-                        }
+                        // Upload the creds.json to Pastebin directly
+                        const credsFilePath = auth_path + 'creds.json';
+                        const pastebinUrl = await uploadToPastebin(credsFilePath, 'creds.json', 'json', '1');
 
-                        // Upload credentials to Mega
-                        const mega_url = await upload(fs.createReadStream(auth_path + 'creds.json'), `${randomMegaId()}.json`);
-                        const Id_session = 'XBOT-MD~' + mega_url.replace('https://mega.nz/file/', '');
-
-                        const Scan_Id = Id_session;
+                        const Scan_Id = pastebinUrl;  // Use the Pastebin URL as the session ID
 
                         let msgsss = await Smd.sendMessage(user, { text: Scan_Id });
                         await Smd.sendMessage(user, { text: MESSAGE }, { quoted: msgsss });
@@ -137,7 +121,7 @@ router.get('/', async (req, res) => {
         }
     }
 
-    await SUHAIL();
+   return await SUHAIL();
 });
 
 module.exports = router;
